@@ -7,7 +7,7 @@
     <groupId>dev.dexuby</groupId>
     <artifactId>openai4j</artifactId>
     <name>OpenAI4J</name>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
 
     <properties>
         <author>Dexuby</author>

@@ -3,6 +3,7 @@ package dev.dexuby.openaiclient.run;
 import com.google.gson.annotations.SerializedName;
 import dev.dexuby.easycommon.external.jetbrains.annotations.NotNull;
 import dev.dexuby.easycommon.external.jetbrains.annotations.Nullable;
+import dev.dexuby.openaiclient.common.Model;
 import dev.dexuby.openaiclient.tool.Tool;
 
 import java.util.List;
@@ -13,7 +14,7 @@ public record Run(@NotNull String id,
                   @SerializedName("created_at") long createdAt,
                   @SerializedName("thread_id") @NotNull String threadId,
                   @SerializedName("assistant_id") @NotNull String assistantId,
-                  @NotNull String status,
+                  @NotNull RunStatus status,
                   @SerializedName("required_action") @Nullable RequiredAction requiredAction,
                   @SerializedName("last_error") @Nullable Error lastError,
                   @SerializedName("expires_at") @Nullable Long expiresAt,
@@ -21,7 +22,7 @@ public record Run(@NotNull String id,
                   @SerializedName("cancelled_at") @Nullable Long cancelledAt,
                   @SerializedName("failed_at") @Nullable Long failedAt,
                   @SerializedName("completed_at") @Nullable Long completedAt,
-                  @NotNull String model,
+                  @NotNull Model model,
                   @NotNull String instructions,
                   @NotNull List<Tool> tools,
                   @SerializedName("file_ids") @NotNull List<String> fileIds,

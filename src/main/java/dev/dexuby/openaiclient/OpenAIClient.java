@@ -24,10 +24,7 @@ import dev.dexuby.openaiclient.thread.ThreadModificationRequest;
 import dev.dexuby.openaiclient.tts.TextToSpeechRequest;
 import org.apache.http.Consts;
 import org.apache.http.HttpEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpDelete;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.*;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -265,15 +262,14 @@ public class OpenAIClient {
 
         final CompletableFuture<File> future = new CompletableFuture<>();
         this.executorService.submit(() -> {
-            try (final CloseableHttpClient httpClient = HttpClients.createDefault()) {
-                final HttpPost postRequest = new HttpPost("https://api.openai.com/v1/audio/speech");
-                postRequest.addHeader("Authorization", String.format("Bearer %s", this.apiKey));
-                final StringEntity entity = new StringEntity(
-                        Constants.GSON.toJson(request),
-                        ContentType.create("application/json", Consts.UTF_8)
-                );
-                postRequest.setEntity(entity);
-                final CloseableHttpResponse response = httpClient.execute(postRequest);
+            final HttpPost postRequest = this.populateHeaders(new HttpPost("https://api.openai.com/v1/audio/speech"));
+            final StringEntity entity = new StringEntity(
+                    Constants.GSON.toJson(request),
+                    ContentType.create("application/json", Consts.UTF_8)
+            );
+            postRequest.setEntity(entity);
+            try (final CloseableHttpClient httpClient = HttpClients.createDefault();
+                 final CloseableHttpResponse response = httpClient.execute(postRequest)) {
                 final HttpEntity responseEntity = response.getEntity();
                 try (final BufferedInputStream bufferedInputStream = new BufferedInputStream(responseEntity.getContent());
                      final BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(new FileOutputStream(targetFile))) {
@@ -283,8 +279,6 @@ public class OpenAIClient {
                 } catch (final Exception ex) {
                     Constants.LOGGER.warn("Failed to generate text to speech", ex);
                 }
-                response.close();
-
                 future.complete(targetFile);
             } catch (final Exception ex) {
                 Constants.LOGGER.warn("Failed to generate text to speech", ex);
@@ -304,15 +298,14 @@ public class OpenAIClient {
 
         final CompletableFuture<BufferedInputStream> future = new CompletableFuture<>();
         this.executorService.submit(() -> {
-            try (final CloseableHttpClient httpClient = HttpClients.createDefault()) {
-                final HttpPost postRequest = new HttpPost("https://api.openai.com/v1/audio/speech");
-                postRequest.addHeader("Authorization", String.format("Bearer %s", this.apiKey));
-                final StringEntity entity = new StringEntity(
-                        Constants.GSON.toJson(data),
-                        ContentType.create("application/json", Consts.UTF_8)
-                );
-                postRequest.setEntity(entity);
-                final CloseableHttpResponse response = httpClient.execute(postRequest);
+            final HttpPost postRequest = this.populateHeaders(new HttpPost("https://api.openai.com/v1/audio/speech"));
+            final StringEntity entity = new StringEntity(
+                    Constants.GSON.toJson(data),
+                    ContentType.create("application/json", Consts.UTF_8)
+            );
+            postRequest.setEntity(entity);
+            try (final CloseableHttpClient httpClient = HttpClients.createDefault();
+                 final CloseableHttpResponse response = httpClient.execute(postRequest)) {
                 final HttpEntity responseEntity = response.getEntity();
                 final BufferedInputStream bufferedInputStream = new BufferedInputStream(responseEntity.getContent());
                 future.complete(bufferedInputStream);
@@ -330,21 +323,16 @@ public class OpenAIClient {
 
         final CompletableFuture<T> future = new CompletableFuture<>();
         this.executorService.submit(() -> {
-            try (final CloseableHttpClient httpClient = HttpClients.createDefault()) {
-                final HttpPost postRequest = new HttpPost(address);
-                postRequest.addHeader("OpenAI-Beta", "assistants=v1");
-                postRequest.addHeader("Authorization", String.format("Bearer %s", this.apiKey));
-                final StringEntity entity = new StringEntity(
-                        Constants.GSON.toJson(request),
-                        ContentType.create("application/json", Consts.UTF_8)
-                );
-                postRequest.setEntity(entity);
-                final CloseableHttpResponse response = httpClient.execute(postRequest);
+            final HttpPost postRequest = this.populateHeaders(new HttpPost(address));
+            final StringEntity entity = new StringEntity(
+                    Constants.GSON.toJson(request),
+                    ContentType.create("application/json", Consts.UTF_8)
+            );
+            postRequest.setEntity(entity);
+            try (final CloseableHttpClient httpClient = HttpClients.createDefault();
+                 final CloseableHttpResponse response = httpClient.execute(postRequest)) {
                 final HttpEntity responseEntity = response.getEntity();
-
                 final String content = EntityUtils.toString(responseEntity);
-                response.close();
-
                 final JsonObject jsonObject = JsonParser.parseString(content).getAsJsonObject();
                 future.complete(Constants.GSON.fromJson(jsonObject, clazz));
             } catch (final Exception ex) {
@@ -361,21 +349,16 @@ public class OpenAIClient {
 
         final CompletableFuture<String> future = new CompletableFuture<>();
         this.executorService.submit(() -> {
-            try (final CloseableHttpClient httpClient = HttpClients.createDefault()) {
-                final HttpPost postRequest = new HttpPost(address);
-                postRequest.addHeader("OpenAI-Beta", "assistants=v1");
-                postRequest.addHeader("Authorization", String.format("Bearer %s", this.apiKey));
-                final StringEntity entity = new StringEntity(
-                        Constants.GSON.toJson(request),
-                        ContentType.create("application/json", Consts.UTF_8)
-                );
-                postRequest.setEntity(entity);
-                final CloseableHttpResponse response = httpClient.execute(postRequest);
+            final HttpPost postRequest = this.populateHeaders(new HttpPost(address));
+            final StringEntity entity = new StringEntity(
+                    Constants.GSON.toJson(request),
+                    ContentType.create("application/json", Consts.UTF_8)
+            );
+            postRequest.setEntity(entity);
+            try (final CloseableHttpClient httpClient = HttpClients.createDefault();
+                 final CloseableHttpResponse response = httpClient.execute(postRequest)) {
                 final HttpEntity responseEntity = response.getEntity();
-
                 final String content = EntityUtils.toString(responseEntity);
-                response.close();
-
                 future.complete(content);
             } catch (final Exception ex) {
                 Constants.LOGGER.warn("Failed to post data.", ex);
@@ -391,16 +374,11 @@ public class OpenAIClient {
 
         final CompletableFuture<T> future = new CompletableFuture<>();
         this.executorService.submit(() -> {
-            try (final CloseableHttpClient httpClient = HttpClients.createDefault()) {
-                final HttpGet getRequest = new HttpGet(address);
-                getRequest.addHeader("OpenAI-Beta", "assistants=v1");
-                getRequest.addHeader("Authorization", String.format("Bearer %s", this.apiKey));
-                final CloseableHttpResponse response = httpClient.execute(getRequest);
+            final HttpGet getRequest = this.populateHeaders(new HttpGet(address));
+            try (final CloseableHttpClient httpClient = HttpClients.createDefault();
+                 final CloseableHttpResponse response = httpClient.execute(getRequest)) {
                 final HttpEntity responseEntity = response.getEntity();
-
                 final String content = EntityUtils.toString(responseEntity);
-                response.close();
-
                 final JsonObject jsonObject = JsonParser.parseString(content).getAsJsonObject();
                 future.complete(Constants.GSON.fromJson(jsonObject, clazz));
             } catch (final Exception ex) {
@@ -417,16 +395,11 @@ public class OpenAIClient {
 
         final CompletableFuture<String> future = new CompletableFuture<>();
         this.executorService.submit(() -> {
-            try (final CloseableHttpClient httpClient = HttpClients.createDefault()) {
-                final HttpGet getRequest = new HttpGet(address);
-                getRequest.addHeader("OpenAI-Beta", "assistants=v1");
-                getRequest.addHeader("Authorization", String.format("Bearer %s", this.apiKey));
-                final CloseableHttpResponse response = httpClient.execute(getRequest);
+            final HttpGet getRequest = this.populateHeaders(new HttpGet(address));
+            try (final CloseableHttpClient httpClient = HttpClients.createDefault();
+                 final CloseableHttpResponse response = httpClient.execute(getRequest)) {
                 final HttpEntity responseEntity = response.getEntity();
-
                 final String content = EntityUtils.toString(responseEntity);
-                response.close();
-
                 future.complete(content);
             } catch (final Exception ex) {
                 Constants.LOGGER.warn("Failed to read data.", ex);
@@ -442,16 +415,11 @@ public class OpenAIClient {
 
         final CompletableFuture<T> future = new CompletableFuture<>();
         this.executorService.submit(() -> {
-            try (final CloseableHttpClient httpClient = HttpClients.createDefault()) {
-                final HttpDelete deleteRequest = new HttpDelete(address);
-                deleteRequest.addHeader("OpenAI-Beta", "assistants=v1");
-                deleteRequest.addHeader("Authorization", String.format("Bearer %s", this.apiKey));
-                final CloseableHttpResponse response = httpClient.execute(deleteRequest);
+            final HttpDelete deleteRequest = this.populateHeaders(new HttpDelete(address));
+            try (final CloseableHttpClient httpClient = HttpClients.createDefault();
+                 final CloseableHttpResponse response = httpClient.execute(deleteRequest)) {
                 final HttpEntity responseEntity = response.getEntity();
-
                 final String content = EntityUtils.toString(responseEntity);
-                response.close();
-
                 final JsonObject jsonObject = JsonParser.parseString(content).getAsJsonObject();
                 future.complete(Constants.GSON.fromJson(jsonObject, clazz));
             } catch (final Exception ex) {
@@ -461,6 +429,15 @@ public class OpenAIClient {
         });
 
         return future;
+
+    }
+
+    private <T extends HttpRequestBase> T populateHeaders(@NotNull final T request) {
+
+        request.addHeader("Authorization", "Bearer " + this.apiKey);
+        request.addHeader("OpenAI-Beta", "assistants=v1");
+
+        return request;
 
     }
 
