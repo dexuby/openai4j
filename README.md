@@ -58,3 +58,10 @@ final Run run = client.createRun(thread.id(),
         .build()
     ).join();
 ```
+
+To-do - If you want to contribute you can work on those items:
+- Improve/clean up request handling.
+- Support for non-Beta API features.
+- Support for rate limit headers.
+- Better error handling.
+- ...
