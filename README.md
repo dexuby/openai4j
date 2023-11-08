@@ -20,7 +20,7 @@ Requirements:
 ```
 Latest version can be found here: https://github.com/dexuby/openai4j/releases
 
-Currently pretty much only supports all the new Beta features like Assistants (and TTS). Method and Class names usually match the API Documentation names.
+Has been made in a really short amount of time so currently pretty much only supports all the new Beta features like Assistants (and TTS). Method and Class names usually match the API Documentation names.
 
 Supported API features:
 - Audio
