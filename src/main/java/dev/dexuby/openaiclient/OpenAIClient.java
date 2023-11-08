@@ -22,25 +22,30 @@ import dev.dexuby.openaiclient.thread.Thread;
 import dev.dexuby.openaiclient.thread.ThreadCreationRequest;
 import dev.dexuby.openaiclient.thread.ThreadModificationRequest;
 import dev.dexuby.openaiclient.tts.TextToSpeechRequest;
-import org.apache.http.Consts;
-import org.apache.http.HttpEntity;
-import org.apache.http.client.methods.*;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.client5.http.classic.methods.HttpDelete;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.io.entity.StringEntity;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+@SuppressWarnings("deprecation")
 public class OpenAIClient {
 
     private final ExecutorService executorService = Executors.newCachedThreadPool();
@@ -265,7 +270,7 @@ public class OpenAIClient {
             final HttpPost postRequest = this.populateHeaders(new HttpPost("https://api.openai.com/v1/audio/speech"));
             final StringEntity entity = new StringEntity(
                     Constants.GSON.toJson(request),
-                    ContentType.create("application/json", Consts.UTF_8)
+                    ContentType.create("application/json", StandardCharsets.UTF_8)
             );
             postRequest.setEntity(entity);
             try (final CloseableHttpClient httpClient = HttpClients.createDefault();
@@ -301,7 +306,7 @@ public class OpenAIClient {
             final HttpPost postRequest = this.populateHeaders(new HttpPost("https://api.openai.com/v1/audio/speech"));
             final StringEntity entity = new StringEntity(
                     Constants.GSON.toJson(data),
-                    ContentType.create("application/json", Consts.UTF_8)
+                    ContentType.create("application/json", StandardCharsets.UTF_8)
             );
             postRequest.setEntity(entity);
             try (final CloseableHttpClient httpClient = HttpClients.createDefault();
@@ -326,7 +331,7 @@ public class OpenAIClient {
             final HttpPost postRequest = this.populateHeaders(new HttpPost(address));
             final StringEntity entity = new StringEntity(
                     Constants.GSON.toJson(request),
-                    ContentType.create("application/json", Consts.UTF_8)
+                    ContentType.create("application/json", StandardCharsets.UTF_8)
             );
             postRequest.setEntity(entity);
             try (final CloseableHttpClient httpClient = HttpClients.createDefault();
@@ -352,7 +357,7 @@ public class OpenAIClient {
             final HttpPost postRequest = this.populateHeaders(new HttpPost(address));
             final StringEntity entity = new StringEntity(
                     Constants.GSON.toJson(request),
-                    ContentType.create("application/json", Consts.UTF_8)
+                    ContentType.create("application/json", StandardCharsets.UTF_8)
             );
             postRequest.setEntity(entity);
             try (final CloseableHttpClient httpClient = HttpClients.createDefault();
@@ -432,7 +437,7 @@ public class OpenAIClient {
 
     }
 
-    private <T extends HttpRequestBase> T populateHeaders(@NotNull final T request) {
+    private <T extends HttpUriRequestBase> T populateHeaders(@NotNull final T request) {
 
         request.addHeader("Authorization", "Bearer " + this.apiKey);
         request.addHeader("OpenAI-Beta", "assistants=v1");
