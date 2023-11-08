@@ -37,7 +37,14 @@ Supported API features:
 Example usage:
 ```java
 final OpenAIClient client = new OpenAIClient("<YOUR API KEY>");
-final Assistant assistant = client.retrieveAssistant("<EXAMPLE ASSISTANT ID>").join();
+final Assistant assistant = client.createAssistant(
+    AssistantCreationRequest.builder()
+        .model(Model.GPT_4_TURBO)
+        .name("Example")
+        .description("Just an example assistant.")
+        .instructions("You are a helpful assistant.")
+        .build()
+    ).join();
 final Thread thread = client.createThread(ThreadCreationRequest.empty()).join();
 client.createMessage(thread.id(),
     MessageCreationRequest.builder()
