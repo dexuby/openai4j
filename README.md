@@ -33,7 +33,9 @@ Supported API features:
   - Full support
 - Runs
   - Full support
-
+- Images
+  - Create
+    
 Example usage:
 ```java
 final OpenAIClient client = new OpenAIClient("<YOUR API KEY>");
