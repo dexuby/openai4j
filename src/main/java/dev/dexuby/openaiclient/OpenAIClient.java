@@ -11,6 +11,8 @@ import dev.dexuby.openaiclient.common.Constants;
 import dev.dexuby.openaiclient.common.DeletionStatus;
 import dev.dexuby.openaiclient.common.EndPoint;
 import dev.dexuby.openaiclient.common.Request;
+import dev.dexuby.openaiclient.image.ImageCreationRequest;
+import dev.dexuby.openaiclient.image.ImageList;
 import dev.dexuby.openaiclient.message.Message;
 import dev.dexuby.openaiclient.message.MessageCreationRequest;
 import dev.dexuby.openaiclient.message.MessageListQuery;
@@ -254,6 +256,15 @@ public class OpenAIClient {
                 runs.add(Constants.GSON.fromJson(jsonElement, RunStep.class));
             future.complete(runs);
         });
+
+        return future;
+
+    }
+
+    public CompletableFuture<ImageList> createImage(@NotNull final ImageCreationRequest request) {
+
+        final CompletableFuture<ImageList> future = new CompletableFuture<>();
+        this.postRequestAndGetJsonObject(EndPoint.combine(EndPoint.IMAGES, "generations"), request, ImageList.class).thenAccept(future::complete);
 
         return future;
 
